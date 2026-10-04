@@ -3,4 +3,4 @@ dist/
 .astro/
 .env.local
 .DS_Store
-
+output/

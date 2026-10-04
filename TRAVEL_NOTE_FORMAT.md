@@ -218,7 +218,8 @@ Rules:
 - Entity titles must be globally unique.
 - Unknown public fields must fail the build.
 - Every entity should end with `[Back to top](<#Trip Title>)` for note navigation. The website parser should ignore this navigation link.
-- Google Maps references should prefer a verified Google Maps share URL (`maps.app.goo.gl`) or a full place URL with a place id. If no verified share URL is available, use `https://www.google.com/maps?q=<exact place name + address>` instead of hand-building `/maps/place/<text>` URLs; hand-built place URLs can open as blank `maps/place//@...` pages.
+- Google Maps references must use a verified individual-place link: an actual Google Maps share URL (`maps.app.goo.gl`) or a working full place URL containing the real place identity. Open the destination (following short-link redirects) and verify the place name, exact branch, address, and location. A successful HTTP response or plausible URL text alone is not verification.
+- Do not use Maps search/query URLs or hand-built `/maps/place/<text>` URLs. Reject links that open a search-results page, the wrong branch, a Maps homepage/current-location view, or a blank `maps/place//@...` page. If no individual-place link can be verified, mark the link unresolved and keep the note in draft as needed; do not substitute a search link or claim the entity is ready for publication.
 - If `Image` is present, `ImageCredit` is required.
 - `Image` must use a reference link in the form `Image：[Image][img-key]`; the referenced URL must be a stable HTTPS direct image URL.
 - Put image URLs in `References`, using keys such as `[img-hakoshima-jinja]`.

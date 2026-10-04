@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wei 旅遊網頁"
+  short_description: "從旅程筆記建立與更新旅行網站，驗證公開資料、手機介面與安全部署"
+  default_prompt: "請用 $wei-travel-website 更新指定旅程的網頁，驗證完成後回報結果。"

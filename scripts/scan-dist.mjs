@@ -2,24 +2,27 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { scanPublicPayload } from './lib/trip-parser.mjs';
+import { defaultNotePath, readPublicSource, publicScanAllowances } from './lib/public-source.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const roots = [path.join(projectRoot, 'src/data/trips'), path.join(projectRoot, 'dist')];
 const files = [];
-const allowedPrices = [];
-const allowedImageUrls = [];
+const trips = [];
+let secrets = [];
+try {
+  const source = await readPublicSource(process.env.TRAVEL_NOTE_PATH || defaultNotePath);
+  secrets = source.secrets;
+} catch (error) {
+  // Private Vault is absent in CI. Explicit sources must always be readable.
+  if (process.env.TRAVEL_NOTE_PATH || error.code !== 'ENOENT') throw error;
+}
 
 for (const entry of await fs.readdir(path.join(projectRoot, 'src/data/trips'))) {
   if (!entry.endsWith('.json')) continue;
   const trip = JSON.parse(await fs.readFile(path.join(projectRoot, 'src/data/trips', entry), 'utf8'));
-  for (const entity of trip.entities ?? []) {
-    if (entity.image?.url) allowedImageUrls.push(entity.image.url);
-    if (entity.type === 'stay' && entity.price?.text) allowedPrices.push(entity.price.text);
-    if (entity.type === 'transport') {
-      for (const segment of entity.segments ?? []) if (segment.price?.text) allowedPrices.push(segment.price.text);
-    }
-  }
+  trips.push(trip);
 }
+const { prices: allowedPrices, images: allowedImageUrls } = publicScanAllowances(trips);
 
 async function walk(target) {
   const stat = await fs.stat(target);
@@ -34,7 +37,7 @@ for (const root of roots) await walk(root);
 const findings = [];
 for (const file of files) {
   const content = await fs.readFile(file, 'utf8');
-  for (const finding of scanPublicPayload(content, [], allowedPrices, allowedImageUrls)) findings.push(`${path.relative(projectRoot, file)}: ${finding}`);
+  for (const finding of scanPublicPayload(content, secrets, allowedPrices, allowedImageUrls)) findings.push(`${path.relative(projectRoot, file)}: ${finding}`);
 }
 if (findings.length) throw new Error(`Secret scan failed:\n${findings.join('\n')}`);
-console.log(`Secret scan passed across ${files.length} public files.`);
+console.log(`Secret scan passed across ${files.length} public files (${secrets.length ? 'with local source fingerprints' : 'CI pattern scan; no source fingerprints'}).`);

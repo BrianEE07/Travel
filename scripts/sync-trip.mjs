@@ -1,14 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseTrip } from './lib/trip-parser.mjs';
+import { defaultNotePath, readPublicSource } from './lib/public-source.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const defaultSource = '/Users/ywfan/Library/Mobile Documents/iCloud~md~obsidian/Documents/SecondBrain/01_Inbox_Notes/福岡之旅 20260827~0903.md';
-const sourcePath = process.env.TRAVEL_NOTE_PATH || defaultSource;
-
-const markdown = await fs.readFile(sourcePath, 'utf8');
-const { trip } = parseTrip(markdown);
+const sourcePath = process.env.TRAVEL_NOTE_PATH || defaultNotePath;
+const { trip } = await readPublicSource(sourcePath);
 for (const [label, asset] of [['trip_cover', trip.coverImage], ['trip_briefing_image', trip.briefingImage]]) {
   const assetPath = path.join(projectRoot, 'public', asset.slice(1));
   try {
@@ -25,7 +22,5 @@ if (trip.status === 'draft') {
   console.log(`Draft trip removed from public data: ${trip.title}`);
   process.exit(0);
 }
-const sourceStat = await fs.stat(sourcePath);
-trip.updatedAt = sourceStat.mtime.toISOString();
 await fs.writeFile(outputPath, `${JSON.stringify(trip, null, 2)}\n`);
 console.log(`Public trip data updated: ${trip.title} · ${trip.days.length} days · ${trip.entities.length} detail cards`);

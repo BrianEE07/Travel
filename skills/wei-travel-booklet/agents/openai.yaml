@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wei 旅行手冊"
+  short_description: "直接從旅程筆記製作清爽旅行手冊，含閱讀版、跨頁預覽與可折冊印刷版"
+  default_prompt: "請用 $wei-travel-booklet 先規劃指定旅程的手冊，再製作並驗證印刷拼版。"

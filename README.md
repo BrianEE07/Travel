@@ -16,7 +16,7 @@
 TRAVEL_NOTE_PATH="/absolute/path/to/旅行筆記.md" npm run publish
 ```
 
-`publish` 會解析指定筆記、產生公開 JSON、執行測試與型別檢查、建立靜態網站、掃描公開輸出，再提交該旅程資料。既有的其他旅程 JSON 會保留，首頁與 `/{trip_slug}/` 路由會自動收錄。程式碼、format、圖片資產或文件有變動時，需另外一併提交。
+`publish` 會解析指定筆記、產生公開 JSON、執行測試與型別檢查、建立靜態網站、掃描公開輸出，再只提交該旅程 JSON。既有的其他旅程 JSON 會保留，首頁與 `/{trip_slug}/` 路由會自動收錄。它會拒絕已有 staged changes、非 main 分支或尚未推送的既有 commits，避免連帶發布其他工作。程式碼、format、圖片資產或文件有變動時，需審閱後另外明確提交；建置本身不代表授權推送。
 
 ## Travel schema 2
 
@@ -60,6 +60,14 @@ TRAVEL_NOTE_PATH="/absolute/path/to/旅行筆記.md" npm run publish
 
 ## Privacy boundary
 
-Entity 的 `Private：` 必須放在最後；其後內容完全不會進入公開資料。Parser 會記住私人值的比對指紋，並在 JSON 與完整網站輸出中反查。訂房／訂位編號、認證碼、票號、私人付款明細與管理網址即使誤放到公開欄位，也會被最後一道掃描阻止發布。Format 明確允許的住宿、交通等公開參考價格仍可顯示。
+Entity 的 `Private：` 必須放在最後；其後內容完全不會進入公開資料。Parser 會記住私人值的比對指紋並在 JSON 中反查；本機最後掃描會重新讀取筆記，在完整網站輸出中反查，指紋只留在記憶體。GitHub CI 沒有 Vault，使用機密模式與公開價格／圖片 URL allowlist 掃描。訂房／訂位編號、認證碼、票號、私人付款明細與管理網址即使誤放到公開欄位，也會被掃描阻止發布。Format 明確允許的住宿、交通等公開參考價格仍可顯示。
 
 Website Preview、Booking & Tasks、Candidates、Related Notes 等非 allowlist section 不依名稱特判；它們因不在公開清單中而預設不公開。
+
+## Printable booklets and reusable skills
+
+手冊直接由筆記匯出公開快照，不需要先建網站。共用工具放在 `booklet/scripts`，每趟旅程的計畫、文案與圖片放在 `booklet/trips/<slug>`，PDF 放在 `output/pdf/<slug>`；列印方式與 QA 見 [`booklet/README.md`](./booklet/README.md)。核准版福岡 PDF 是風格參考，不會被重建覆寫。
+
+兩份可維護的 skill 來源位於 `skills/wei-travel-website` 與 `skills/wei-travel-booklet`，安裝副本位於 `~/.codex/skills`。網站 skill 處理 schema、UI 與安全發布；手冊 skill 處理精簡內容、圖片、排版與折冊驗證。共用程式保持在本專案，不在 skill 裡複製 parser。新增旅程不寫死日期、清單分類或 24 頁。
+
+本次 workflow 整理沒有變更網站介面，也不自動推送或上傳手冊。既有網站 v1.0.0 Stable 的標記維持。
