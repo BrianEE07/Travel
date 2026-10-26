@@ -4,6 +4,7 @@ All operational times come from the parser's public snapshot. Editorial summarie
 are deliberately curated; changed/missing source rows stop the build for review.
 """
 import json
+from urllib.parse import urlsplit
 from xml.sax.saxutils import escape
 
 from reportlab.pdfgen import canvas
@@ -290,7 +291,8 @@ def back(c):
     renderPDF.draw(drawing, c, 8 * mm, H - 108 * mm)
     p(c, '線上旅行手帖', 82, 10, x=45, width=52, font='TCM', color=b.TEAL)
     p(c, '地圖連結、詳細資訊<br/>與可勾選的完整清單。', 89, 9.5, x=45, width=52)
-    p(c, 'travel.weiweifan.com<br/>/fukuoka-2026/', 101, 8, x=45, width=52, font='Arial', leading=10, color=b.MUTED)
+    web_address = urlsplit(WEB)
+    p(c, escape(web_address.netloc) + '<br/>' + escape(web_address.path), 101, 8, x=45, width=52, font='Arial', leading=10, color=b.MUTED)
     c.linkURL(WEB, (8 * mm, H - 111 * mm, 97 * mm, H - 78 * mm))
     p(c, '依 2026.08.27-09.03 原筆記規劃整理。<br/>行程可能調整；現場以營運與訂位通知為準。', 115, 8.5, leading=11, color=b.MUTED)
     p(c, '照片來源見各頁標示，電子版可點擊。<br/>來源網站保留原著作權；本冊供個人旅行使用。', 126, 7.5, leading=10, color=b.MUTED)
