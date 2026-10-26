@@ -2,7 +2,7 @@
 
 每趟旅程由一份 Obsidian Markdown 筆記產生靜態網站。原始筆記留在 private vault；repository 只保存通過 schema 驗證與安全掃描的公開 JSON。首頁自動建立旅程卡片，行程網址為 `/{trip_slug}/`。
 
-正式網站：[travel.yungwei.com](https://travel.yungwei.com/)，已啟用強制 HTTPS。舊網址的轉址尚待設定；網域遷移進度與可重用步驟見 [`docs/DOMAIN_MIGRATION.md`](./docs/DOMAIN_MIGRATION.md)。
+正式網站：[travel.yungwei.com](https://travel.yungwei.com/)，已啟用強制 HTTPS。舊 Travel 入口的 DNS 已移除，不設轉址；網域遷移紀錄與可重用步驟見 [`docs/DOMAIN_MIGRATION.md`](./docs/DOMAIN_MIGRATION.md)。
 
 目前版本：**v1.0.0 Stable**。福岡之旅已完成主要資訊架構、響應式介面、公開資料防護與自動部署流程，可作為後續旅程的基準版本。
 
